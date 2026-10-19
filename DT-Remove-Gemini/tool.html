@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DT Remove Gemini — Công cụ</title>
+  <link rel="stylesheet" href="ui.css">
+  <style>
+    /* Giao diện tối thương hiệu hocdohoacaptoc (dùng cả khi máy để giao diện sáng) */
+    :root {
+      --bg: #080b12;
+      --panel: #0f1626;
+      --panel-2: #131c30;
+      --line: #22304a;
+      --text: #e8eef8;
+      --muted: #8d9bb3;
+      --accent: #2f6bff;
+      --accent-2: #4d8bff;
+      --accent-text: #ffffff;
+      --ok: #3fcf6e;
+      --warn: #e3a73a;
+      --err: #ff6b6b;
+      color-scheme: dark;
+      --font: "Be Vietnam Pro", "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    }
+    body { font-family: var(--font); background: var(--bg); }
+    [hidden] { display: none !important; }
+    main { max-width: 1240px; margin: 0 auto; padding: 24px 20px 56px; }
+    button { border-color: var(--line); background: var(--panel-2); }
+    button:hover:not(:disabled) { border-color: #34466b; }
+    button.primary:hover:not(:disabled) { background: #3d78ff; border-color: #3d78ff; }
+    .ico { width: 20px; height: 20px; flex: none; }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      position: relative; overflow: hidden; border-radius: 22px; padding: 44px 48px 36px;
+      border: 1px solid rgba(96, 140, 255, .24);
+      background:
+        radial-gradient(60% 90% at 80% 38%, rgba(37, 99, 235, .30), transparent 70%),
+        linear-gradient(135deg, #0f1a33 0%, #0b1324 55%, #0a1020 100%);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, .45);
+    }
+    .hero::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, .035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .035) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, .55) 100%);
+    }
+    .hero-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(240px, 1fr); gap: 24px; align-items: center; }
+    .eyebrow { margin: 0; font-size: 13.5px; font-weight: 700; letter-spacing: .14em; color: var(--accent-2); text-transform: uppercase; }
+    .hero h1 { margin: 10px 0 0; font-size: clamp(30px, 4.2vw, 52px); line-height: 1.12; font-weight: 800; letter-spacing: -.01em; color: #f4f7fc; }
+    .hero h1 span { color: var(--accent-2); }
+    .hero .lead { margin: 16px 0 0; max-width: 640px; font-size: 16.5px; line-height: 1.7; color: #b9c5d9; }
+    .hero .lead kbd {
+      font: 600 13px/1 var(--font); padding: 2px 6px; border-radius: 5px; color: #e8eef8;
+      border: 1px solid #34466b; background: rgba(255, 255, 255, .06);
+    }
+    .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 10px; padding: 15px 24px; border-radius: 11px;
+      font: 600 16.5px/1.2 var(--font); cursor: pointer; text-decoration: none; transition: background .15s, border-color .15s, transform .15s;
+      border: 1px solid rgba(255, 255, 255, .16); background: rgba(255, 255, 255, .04); color: #eef3fb;
+    }
+    .btn:hover { border-color: rgba(255, 255, 255, .3); background: rgba(255, 255, 255, .07); }
+    .btn.primary {
+      background: var(--accent); border-color: var(--accent); color: #fff;
+      box-shadow: 0 10px 28px rgba(47, 107, 255, .38);
+    }
+    .btn.primary:hover { background: #3d78ff; transform: translateY(-1px); }
+    /* Logo Học Đồ Họa Cấp Tốc + hai ô tròn phóng to Trước / Sau đặt cạnh, không che logo */
+    .art { position: relative; display: flex; align-items: center; justify-content: center; gap: 26px; min-height: 300px; }
+    .art::before {
+      content: ""; position: absolute; top: 50%; left: 58%; width: 460px; height: 340px; transform: translate(-50%, -50%);
+      border-radius: 50%; background: radial-gradient(closest-side, rgba(29, 107, 255, .42), transparent);
+      pointer-events: none;
+    }
+    .zooms { position: relative; display: flex; flex-direction: column; gap: 30px; flex: none; }
+    .zoom { position: relative; width: 112px; height: 112px; }
+    .zoom img {
+      display: block; width: 100%; height: 100%; border-radius: 50%; border: 4px solid #fff;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, .5);
+    }
+    .zoom-tag {
+      position: absolute; left: 50%; bottom: -11px; transform: translateX(-50%); padding: 3px 12px; border-radius: 999px;
+      font: 800 12.5px/1.2 var(--font); letter-spacing: .06em; color: #fff; white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .35);
+    }
+    .zoom-tag.before { background: #e11d48; }
+    .zoom-tag.after { background: #16a34a; }
+    .brand-logo {
+      position: relative; flex: 0 1 300px; min-width: 0; width: 300px; height: auto;
+      filter: drop-shadow(0 18px 40px rgba(9, 100, 254, .35));
+    }
+    .chips { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 34px; }
+    .chips div {
+      display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px 14px; border-radius: 11px;
+      border: 1px solid rgba(255, 255, 255, .11); background: rgba(255, 255, 255, .035);
+      font-size: 15px; font-weight: 600; color: #e6ecf6; text-align: center;
+    }
+    .chips .ico { color: var(--accent-2); }
+    @media (max-width: 960px) {
+      .hero { padding: 32px 26px 26px; }
+      .hero-grid { grid-template-columns: 1fr; }
+      .art { margin-top: 6px; }
+      .chips { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 540px) {
+      main { padding: 16px 16px 40px; }
+      .hero { padding: 26px 18px 20px; border-radius: 16px; }
+      .chips { grid-template-columns: 1fr; }
+      .btn { width: 100%; justify-content: center; }
+      .art { gap: 16px; min-height: 0; }
+      .zoom { width: 84px; height: 84px; }
+      .zooms { gap: 24px; }
+    }
+
+    /* ---------- Vùng làm việc ---------- */
+    .section-title { margin: 34px 0 0; font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); }
+    #drop {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 12px; min-height: 170px; padding: 24px; text-align: center; cursor: pointer;
+      border: 2px dashed rgba(96, 140, 255, .35); border-radius: 16px; background: rgba(47, 107, 255, .04);
+      transition: border-color .15s, background .15s;
+    }
+    #drop:hover, #drop.over { border-color: var(--accent); background: rgba(47, 107, 255, .09); }
+    #drop .ico { width: 34px; height: 34px; color: var(--accent-2); }
+    #drop strong { font-size: 16px; }
+    #file { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    #drop kbd {
+      font: 600 12px/1 var(--font); padding: 2px 6px; border-radius: 5px;
+      border: 1px solid #34466b; background: rgba(255, 255, 255, .06);
+    }
+    .paste-row { display: flex; gap: 10px; margin-top: 12px; }
+    .paste-row { align-items: flex-start; }
+    .paste-row textarea {
+      flex: 1; min-width: 0; font: inherit; line-height: 1.45; padding: 12px 14px; border-radius: 10px; resize: none;
+      height: 46px; max-height: 128px; overflow-y: auto; white-space: pre-wrap; word-break: break-all;
+      border: 1px solid var(--line); background: var(--panel); color: var(--text);
+    }
+    .paste-row textarea::placeholder { color: #6f7d95; }
+    .paste-row textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+    .paste-row button { height: 46px; padding: 0 22px; border-radius: 10px; white-space: nowrap; }
+    .tray { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .pending {
+      display: flex; align-items: center; gap: 8px; max-width: 280px; padding: 4px 4px 4px 4px; border-radius: 10px;
+      border: 1px solid var(--line); background: var(--panel); font-size: 12.5px;
+    }
+    .pending img { width: 40px; height: 40px; flex: none; object-fit: cover; border-radius: 6px; background: #0b1120; }
+    .pending span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pending button { flex: none; padding: 2px 8px; border: 0; background: none; color: var(--muted); font-size: 16px; line-height: 1; }
+    .pending button:hover { color: var(--err); }
+    .paste-msg { margin: 8px 0 0; min-height: 18px; font-size: 13px; color: var(--muted); }
+    .paste-msg.err { color: var(--err); }
+    .paste-msg.ok { color: var(--ok); }
+
+    .setup {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(330px, 440px); gap: 16px;
+      margin-top: 10px; align-items: stretch;
+    }
+    @media (max-width: 760px) { .setup { grid-template-columns: 1fr; } }
+    .opts {
+      padding: 16px 18px; border: 1px solid var(--line); border-radius: 14px;
+      background: var(--panel); display: grid; gap: 12px; align-content: start;
+    }
+    .opts p { margin: 0; font-size: 12.5px; line-height: 1.6; }
+    .opts code { font-size: 12px; color: #c6d3ea; }
+    .switch .track { background: #2a3754; }
+
+    /* Ô ủng hộ tác giả */
+    .donate {
+      display: flex; gap: 14px; align-items: center; padding: 14px; border-radius: 14px;
+      background: radial-gradient(80% 120% at 0% 0%, rgba(255, 122, 154, .10), transparent 60%), var(--panel);
+      color: #e2e8f0; border: 1px solid var(--line);
+    }
+    .donate .qr {
+      flex: none; width: 124px; height: 124px; padding: 3px; border-radius: 10px; background: #fff;
+      box-shadow: 0 0 0 4px rgba(255, 255, 255, .06), 0 8px 22px rgba(0, 0, 0, .45);
+    }
+    .donate .d-info { flex: 1; min-width: 0; display: grid; gap: 6px; }
+    .donate .d-title { font-size: 15px; font-weight: 700; color: #ff7a9a; }
+    .donate .d-bank { font-size: 12px; color: #cbd5e1; }
+    .donate .d-bank b {
+      display: inline-block; padding: 1px 8px; margin-right: 4px; border-radius: 999px;
+      background: #2563eb; color: #fff; font-size: 11px; letter-spacing: .3px;
+    }
+    .donate .d-row { display: flex; align-items: center; gap: 6px; padding-top: 6px; border-top: 1px solid rgba(255, 255, 255, .08); }
+    .donate .d-row span { flex: 1; min-width: 0; }
+    .donate .d-row small { display: block; font-size: 11px; color: #94a3b8; }
+    .donate .d-row strong { display: block; font-size: 12.5px; color: #f8fafc; word-break: break-word; }
+    .donate .d-row button {
+      flex: none; padding: 3px 8px; font-size: 11.5px; border-radius: 6px;
+      background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .2); color: #e2e8f0;
+    }
+    .donate .d-row button:hover { background: rgba(255, 255, 255, .16); }
+    .donate .d-scan { font-size: 11.5px; color: #94a3b8; }
+
+    /* ---------- Kết quả ---------- */
+    .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 30px 0 4px; }
+    .bar h2 { margin: 0 auto 0 0; font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); }
+    .bar .muted { font-size: 13px; }
+    #list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; margin-top: 12px; }
+    #list:empty::before {
+      content: "Chưa có ảnh nào. Ảnh bạn đưa vào sẽ hiện ở đây, kèm khung Trước / Sau phóng to đúng góc logo.";
+      grid-column: 1 / -1; padding: 26px; border: 1px dashed var(--line); border-radius: 14px;
+      color: var(--muted); font-size: 13.5px; text-align: center;
+    }
+    .card { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--panel); display: flex; flex-direction: column; }
+    .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); }
+    .pair figure { margin: 0; background: #0b1120; position: relative; }
+    .pair canvas { display: block; width: 100%; aspect-ratio: 1; image-rendering: pixelated; }
+    .pair figcaption {
+      position: absolute; left: 6px; top: 6px; font-size: 11px; padding: 1px 7px; border-radius: 6px;
+      background: rgba(8, 11, 18, .7); color: #fff;
+    }
+    .info { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; }
+    .chip { font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; border: 1px solid currentColor; }
+    .chip.ok { color: var(--ok); }
+    .chip.none { color: var(--warn); }
+    .chip.err { color: var(--err); }
+    .chip.busy { color: var(--muted); }
+    .note { font-size: 12px; margin-top: 30px; }
+  </style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <div class="hero-grid">
+      <div>
+        <p class="eyebrow">DT Remove Gemini · hocdohoacaptoc.com</p>
+        <h1>Xoá logo <span>Gemini &amp; Flow</span></h1>
+        <p class="lead">
+          Kéo thả, chọn ảnh hoặc nhấn <kbd>Ctrl</kbd>+<kbd>V</kbd> để dán ảnh, link ảnh, đường dẫn file.
+          Tiện ích tính ngược lại màu gốc dưới ngôi sao ✦ nên không tô mờ, không vẽ đè, giữ nguyên chi tiết.
+          Xử lý ngay trên máy bạn và tự lưu vào thư mục tải xuống.
+        </p>
+        <div class="cta">
+          <label class="btn primary" for="file">
+            <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10 2.5c.6 4.4 2.6 6.4 7 7-4.4.6-6.4 2.6-7 7-.6-4.4-2.6-6.4-7-7 4.4-.6 6.4-2.6 7-7Z"/><path d="M18.5 13.5c.3 2.1 1.2 3 3.3 3.3-2.1.3-3 1.2-3.3 3.3-.3-2.1-1.2-3-3.3-3.3 2.1-.3 3-1.2 3.3-3.3Z"/></svg>
+            Chọn ảnh xoá logo
+          </label>
+          <button class="btn" id="openFolder" type="button">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="3" width="14" height="14" rx="2"/><path d="m7 14 4-4 3 3 2-2 5 5"/><circle cx="16.5" cy="7.5" r="1.3"/><path d="M4 7v12a2 2 0 0 0 2 2h12"/></svg>
+            <span>Xem ảnh đã lưu (<span id="savedCount">0</span>)</span>
+          </button>
+        </div>
+      </div>
+      <div class="art">
+        <div class="zooms" role="img" aria-label="Góc ảnh Gemini trước và sau khi xoá logo">
+          <div class="zoom"><img src="img/zoom-truoc.jpg" alt=""><span class="zoom-tag before">TRƯỚC</span></div>
+          <div class="zoom"><img src="img/zoom-sau.jpg" alt=""><span class="zoom-tag after">SAU</span></div>
+        </div>
+        <img class="brand-logo" src="icons/logo-hocdohoacaptoc.svg" alt="Logo Học Đồ Họa Cấp Tốc">
+      </div>
+    </div>
+    <div class="chips">
+      <div>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+        Tự xoá khi bấm tải
+      </div>
+      <div>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12l4 6-10 12L2 9Z"/><path d="M2 9h20"/><path d="m10 3-2 6 4 12 4-12-2-6"/></svg>
+        Giữ nguyên chất lượng
+      </div>
+      <div>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.4 8.4 8 9.5 4.6-1.1 8-4.5 8-9.5V6Z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>
+        Ảnh không gửi đi đâu
+      </div>
+      <div>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M9 10h6M9 14h6M9 18h3"/></svg>
+        Dán Ctrl+V, link ảnh
+      </div>
+    </div>
+  </section>
+
+  <h2 class="section-title">Đưa ảnh vào</h2>
+  <label id="drop">
+    <input type="file" id="file" accept="image/png,image/jpeg,image/webp" multiple>
+    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+    <strong>Kéo thả ảnh vào đây, bấm để chọn ảnh, hoặc nhấn <kbd>Ctrl</kbd>+<kbd>V</kbd></strong>
+    <span class="muted">Dán được ảnh đã sao chép, file copy từ thư mục, link ảnh hoặc đường dẫn file, rồi bấm <b>Xoá logo</b> · PNG, JPG, WEBP</span>
+  </label>
+
+  <form class="paste-row" id="urlForm">
+    <textarea id="urlInput" rows="1" autocomplete="off" spellcheck="false"
+      placeholder="Dán link ảnh (https://…) hoặc đường dẫn file (C:\…\anh.jpg), mỗi dòng một ảnh"></textarea>
+    <button class="primary" type="submit" id="runBtn">Xoá logo</button>
+  </form>
+  <div class="tray" id="tray" hidden></div>
+  <p class="paste-msg" id="pasteMsg" role="status"></p>
+
+  <div class="setup">
+  <div class="opts">
+    <label class="switch">
+      <span>Tự động lưu ngay khi xoá logo xong</span>
+      <input type="checkbox" id="autoSave">
+      <span class="track"></span>
+    </label>
+    <label class="switch">
+      <span>Thay thế ảnh gốc (lưu đè, giữ nguyên tên file)</span>
+      <input type="checkbox" id="overwrite">
+      <span class="track"></span>
+    </label>
+    <p class="muted">
+      Ảnh được lưu vào thư mục tải xuống của Chrome — cũng là nơi ảnh tải từ Gemini / Flow được
+      lưu. Khi bật “Thay thế ảnh gốc”, ảnh gốc nằm trong thư mục đó sẽ bị ghi đè bằng bản đã xoá logo;
+      nếu tắt, bản sạch được lưu bên cạnh với đuôi <code>_xoa-logo</code>.
+    </p>
+  </div>
+
+  <aside class="donate" aria-label="Ủng hộ tác giả">
+    <!-- Mã VietQR (chuẩn NAPAS), không điền số tiền; nội dung điền sẵn. -->
+    <img class="qr" src="icons/vietqr-ung-ho-extension.svg" alt="Mã VietQR ủng hộ tác giả — MB Bank 0965165166">
+    <div class="d-info">
+      <div class="d-title">♥ Ủng hộ tác giả</div>
+      <div class="d-bank"><b>MB BANK</b> Đàm Văn Thìn</div>
+      <div class="d-row">
+        <span><small>Số tài khoản</small><strong id="dAcc">0965165166</strong></span>
+        <button type="button" data-copy="dAcc">Sao chép</button>
+      </div>
+      <div class="d-row">
+        <span><small>Nội dung</small><strong id="dNote">Ung ho extension remove logo</strong></span>
+        <button type="button" data-copy="dNote">Sao chép</button>
+      </div>
+      <div class="d-scan">Sự ủng hộ của các bạn sẽ là động lực lớn nhất của chúng tôi. Chúng tôi yêu bạn ♥</div>
+    </div>
+  </aside>
+  </div>
+
+  <div class="bar" id="results">
+    <h2>Kết quả</h2>
+    <span class="muted" id="summary"></span>
+    <button class="primary" id="saveAll" disabled>Lưu ảnh chưa lưu</button>
+    <button id="clear" disabled>Xoá danh sách</button>
+  </div>
+
+  <div id="list"></div>
+
+  <p class="note muted">
+    Chỉ xoá logo ngôi sao hiển thị ở góc phải-dưới. Dấu thuỷ vân ẩn SynthID của Google
+    vẫn còn trong ảnh.
+  </p>
+</main>
+<script src="engine.js"></script>
+<script src="tool.js"></script>
+</body>
+</html>

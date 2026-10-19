@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "DT Remove Gemini",
+  "version": "1.5.0",
+  "description": "Tự động xoá logo ngôi sao Gemini (✦) ở góc ảnh mỗi khi bạn tải ảnh về (Gemini, Google Flow…). Kèm công cụ xoá logo cho ảnh đã tải.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "DT Remove Gemini",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["storage", "downloads", "contextMenus", "offscreen", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://gemini.google.com/*",
+        "https://flow.google.com/*",
+        "https://labs.google/*",
+        "https://aistudio.google.com/*"
+      ],
+      "js": ["engine.js", "inject.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://gemini.google.com/*",
+        "https://flow.google.com/*",
+        "https://labs.google/*",
+        "https://aistudio.google.com/*"
+      ],
+      "js": ["engine.js", "bridge.js"],
+      "run_at": "document_start"
+    }
+  ]
+}

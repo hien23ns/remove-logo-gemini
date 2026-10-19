@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>DT Remove Gemini</title>
+  <link rel="stylesheet" href="ui.css">
+  <style>
+    /* Giao diện tối thương hiệu hocdohoacaptoc, giống trang công cụ */
+    :root {
+      --bg: #0a1020;
+      --panel: rgba(255, 255, 255, .04);
+      --line: rgba(255, 255, 255, .12);
+      --text: #e8eef8;
+      --muted: #8d9bb3;
+      --accent: #2f6bff;
+      --accent-2: #4d8bff;
+      --accent-text: #ffffff;
+      --ok: #3fcf6e;
+      --warn: #e3a73a;
+      --err: #ff6b6b;
+      color-scheme: dark;
+      --font: "Be Vietnam Pro", "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    }
+    html { background: #0a1020; }
+    body {
+      width: 320px; min-height: 100vh; padding: 16px; font-family: var(--font);
+      background:
+        radial-gradient(90% 60% at 100% 0%, rgba(37, 99, 235, .28), transparent 70%),
+        linear-gradient(rgba(255, 255, 255, .03) 1px, transparent 1px) 0 0 / 26px 26px,
+        linear-gradient(90deg, rgba(255, 255, 255, .03) 1px, transparent 1px) 0 0 / 26px 26px,
+        linear-gradient(160deg, #0f1a33 0%, #0b1324 60%, #0a1020 100%);
+    }
+    [hidden] { display: none !important; }
+    .head { display: flex; align-items: center; gap: 11px; }
+    .head img { width: 46px; height: auto; flex: none; filter: drop-shadow(0 4px 12px rgba(9, 100, 254, .45)); }
+    .eyebrow { margin: 0; font-size: 10.5px; font-weight: 700; letter-spacing: .14em; color: var(--accent-2); }
+    .head h1 { margin: 1px 0 0; font-size: 19px; font-weight: 800; line-height: 1.15; color: #f4f7fc; }
+    .head h1 span { color: var(--accent-2); }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-top: 14px; }
+    .switch.sub { margin-top: 10px; font-size: 13px; color: var(--muted); }
+    .switch .track { background: #2a3754; }
+    .card.off .switch.sub { opacity: .5; }
+    .stat { display: flex; justify-content: space-between; align-items: baseline; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
+    .stat b { font-variant-numeric: tabular-nums; font-size: 18px; color: var(--accent-2); }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+    .actions button { padding: 11px 8px; font-weight: 600; line-height: 1.25; border-radius: 10px; }
+    .actions .primary { box-shadow: 0 8px 20px rgba(47, 107, 255, .35); }
+    .actions .primary:hover { background: #3d78ff; }
+    .donate-btn { background: rgba(255, 122, 154, .1); border-color: rgba(255, 122, 154, .35); color: #ff8fab; }
+    .donate-btn:hover { background: rgba(255, 122, 154, .18); }
+    .hint { font-size: 12px; margin: 12px 0 0; line-height: 1.55; }
+    .log-head { display: flex; justify-content: space-between; align-items: baseline; margin-top: 14px; font-size: 13px; font-weight: 600; }
+    .log-head button { border: 0; background: none; padding: 0; font-size: 12px; color: var(--accent); }
+    #log { list-style: none; margin: 6px 0 0; padding: 0; max-height: 210px; overflow-y: auto; font-size: 12px; }
+    #log li { padding: 6px 0; border-top: 1px solid var(--line); }
+    #log .row1 { display: flex; gap: 6px; }
+    #log .time { color: var(--muted); font-variant-numeric: tabular-nums; flex: none; }
+    #log .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #log .res { margin-top: 2px; }
+    #log .ok { color: var(--ok); }
+    #log .warn { color: var(--warn); }
+    #log .err { color: var(--err); }
+    #log .src { color: var(--muted); }
+    #log .empty { color: var(--muted); border-top: 0; }
+
+    /* Màn hình Ủng hộ tác giả: nền tối, chữ sáng (cả khi máy dùng giao diện sáng) */
+    body.donating { color: #e2e8f0; }
+    .back { border: 0; background: none; padding: 0; color: #8ab4f8; font-size: 13px; }
+    .back:hover { color: #b9d2fb; }
+    .thanks { margin: 10px 0 0; text-align: center; }
+    .thanks b { display: block; font-size: 17px; color: #ff7a9a; }
+    .thanks span { display: block; margin-top: 5px; font-size: 12.5px; color: #cbd5e1; }
+    /* Mã QR giữ nền trắng để app ngân hàng quét dễ */
+    .qr {
+      display: block; width: 196px; height: 196px; margin: 14px auto 0; padding: 4px; border-radius: 14px;
+      background: #fff; box-shadow: 0 0 0 5px rgba(255, 255, 255, .08), 0 10px 28px rgba(0, 0, 0, .45);
+    }
+    .bank { display: block; width: max-content; margin: 14px auto 0; padding: 4px 14px; border-radius: 999px; background: #2563eb; color: #fff; font-size: 12px; font-weight: 700; letter-spacing: .4px; }
+    .info { margin-top: 12px; border: 1px solid rgba(255, 255, 255, .14); border-radius: 12px; overflow: hidden; background: rgba(255, 255, 255, .05); }
+    .info .r { display: flex; align-items: center; gap: 8px; padding: 9px 11px; border-top: 1px solid rgba(255, 255, 255, .1); font-size: 12.5px; }
+    .info .r:first-child { border-top: 0; }
+    .info .k { color: #94a3b8; flex: none; width: 92px; }
+    .info .v { font-weight: 600; flex: 1; word-break: break-word; color: #f8fafc; }
+    .info button {
+      flex: none; padding: 3px 9px; font-size: 12px; border-radius: 6px;
+      background: rgba(255, 255, 255, .1); border-color: rgba(255, 255, 255, .22); color: #e2e8f0;
+    }
+    .info button:hover { background: rgba(255, 255, 255, .18); }
+    .scan { font-size: 12px; text-align: center; margin: 12px 0 0; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <section id="main">
+    <div class="head">
+      <img src="icons/logo-hocdohoacaptoc.svg" alt="Học Đồ Họa Cấp Tốc">
+      <div>
+        <p class="eyebrow">HOCDOHOACAPTOC.COM</p>
+        <h1>DT Remove <span>Gemini</span></h1>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="switch">
+        <span>Tự động xoá logo mỗi khi tải ảnh về</span>
+        <input type="checkbox" id="enabled">
+        <span class="track"></span>
+      </label>
+      <label class="switch sub">
+        <span>Áp dụng cả với ảnh tải từ trang khác (Facebook, Zalo…)</span>
+        <input type="checkbox" id="allSites">
+        <span class="track"></span>
+      </label>
+      <label class="switch sub">
+        <span>Giữ nhãn “Tạo bằng AI” trong ảnh (Facebook, Instagram sẽ hiện nhãn Thông tin AI)</span>
+        <input type="checkbox" id="keepAiInfo">
+        <span class="track"></span>
+      </label>
+      <div class="stat muted">
+        <span>Số ảnh đã xoá logo</span>
+        <b id="count">0</b>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="donate-btn" id="openDonate" type="button">♥ Ủng hộ tác giả</button>
+      <button class="primary" id="openTool" type="button">Xoá logo ảnh đã tải về</button>
+    </div>
+
+    <p class="hint muted">
+      Cứ bấm <b>Tải xuống</b> như bình thường: ảnh có logo Gemini sẽ được xoá logo trước khi
+      lưu, giữ nguyên tên file. Ảnh không có logo được tải về nguyên vẹn.
+    </p>
+
+    <div class="log-head">
+      <span>Nhật ký gần đây</span>
+      <button id="clearLog" type="button">Xoá</button>
+    </div>
+    <ul id="log"></ul>
+  </section>
+
+  <section id="donate" hidden>
+    <button class="back" id="closeDonate" type="button">← Quay lại</button>
+    <p class="thanks">
+      <b>Cảm ơn bạn đã ủng hộ!</b>
+      <span>Khoản ủng hộ của bạn là động lực để tôi tiếp tục phát triển và bổ sung thêm nhiều tính năng mới cho tiện ích.</span>
+    </p>
+    <!-- Mã VietQR (chuẩn NAPAS) dựng từ đúng số tài khoản, không điền số tiền; nội dung điền sẵn. -->
+    <img class="qr" src="icons/vietqr-ung-ho.svg" alt="Mã VietQR ủng hộ tác giả — MB Bank 0965165166">
+    <span class="bank">MB BANK</span>
+    <div class="info">
+      <div class="r"><span class="k">Chủ tài khoản</span><span class="v">Đàm Văn Thìn</span></div>
+      <div class="r"><span class="k">Số tài khoản</span><span class="v" id="acc">0965165166</span><button type="button" data-copy="acc">Sao chép</button></div>
+      <div class="r"><span class="k">Nội dung</span><span class="v" id="note">Ung ho tac gia gemini</span><button type="button" data-copy="note">Sao chép</button></div>
+    </div>
+    <p class="scan muted">Mở app ngân hàng, quét mã QR rồi nhập số tiền tuỳ tâm.</p>
+  </section>
+  <script src="popup.js"></script>
+</body>
+</html>
